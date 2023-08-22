@@ -136,7 +136,7 @@ class MADE(base.AutoregressiveModel):
 def reproduce(
     n_epochs=85,
     batch_size=64,
-    log_dir="/tmp/run",
+    log_dir="./experiments/MADE",
     n_gpus=1,
     device_id=0,
     debug_loader=None,
@@ -161,6 +161,7 @@ def reproduce(
 
     from pytorch_generative import datasets, models, trainer
 
+    print(f"=== Training parameters: Nepoch={n_epochs}, Batch size={batch_size}, log_dir={log_dir}, GPU:{n_gpus!=0}")
     train_loader, test_loader = debug_loader, debug_loader
     if train_loader is None:
         train_loader, test_loader = datasets.get_mnist_loaders(

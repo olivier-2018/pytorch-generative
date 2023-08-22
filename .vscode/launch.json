@@ -1,0 +1,76 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "train NADE",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                    "--model", "nade",
+                    "--epochs", "25",
+                    "--batch-size", "1024",
+                    "--logdir", "./experiments/NADE",
+                    "--gpus", "1"
+            ]
+        },
+        {
+            "name": "train MADE",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                    "--model", "made",
+                    "--reproduce"
+            ]
+        }, 
+        {
+            "name": "train NICE",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                    "--model", "nice",
+                    // "--reproduce",
+                    "--epochs", "300",
+                    "--batch-size", "2048",
+                    "--logdir", "./experiments/NICE",
+                    "--gpus", "1"
+            ]
+        },
+        {
+            "name": "train image_gpt",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                    "--model", "image_gpt",
+                    "--reproduce",
+            ]
+        },   
+        {
+            "name": "train beta_vae",
+            "type": "python",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                    "--model", "beta_vae",
+                    "--reproduce",
+            ]
+        },            
+    ]
+}
+

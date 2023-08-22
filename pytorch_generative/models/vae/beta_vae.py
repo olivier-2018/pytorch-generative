@@ -62,8 +62,8 @@ class BetaVAE(vae.VAE):
 
 def reproduce(
     n_epochs=500,
-    batch_size=128,
-    log_dir="/tmp/run",
+    batch_size=1024,
+    log_dir="./experiments/beta_VAE",
     n_gpus=1,
     device_id=0,
     debug_loader=None,
@@ -105,6 +105,7 @@ def reproduce(
         residual_channels=32,
     )
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_loader)*3, gamma=0.96)
 
     def loss_fn(x, _, preds):
         preds, kl_div = preds
@@ -121,9 +122,10 @@ def reproduce(
     model_trainer = trainer.Trainer(
         model=model,
         loss_fn=loss_fn,
-        optimizer=optimizer,
+        optimizer=optimizer,        
+        lr_scheduler=scheduler,
         train_loader=train_loader,
-        eval_loader=test_loader,
+        eval_loader=test_loader,        
         log_dir=log_dir,
         n_gpus=n_gpus,
         device_id=device_id,

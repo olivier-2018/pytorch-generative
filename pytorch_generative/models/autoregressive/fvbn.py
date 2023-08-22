@@ -48,7 +48,7 @@ class FullyVisibleBeliefNetwork(base.AutoregressiveModel):
 def reproduce(
     n_epochs=50,
     batch_size=512,
-    log_dir="/tmp/run",
+    log_dir="./experiments/FVBN",
     n_gpus=1,
     device_id=0,
     debug_loader=None,

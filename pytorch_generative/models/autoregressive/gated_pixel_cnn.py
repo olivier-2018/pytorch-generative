@@ -193,7 +193,7 @@ class GatedPixelCNN(base.AutoregressiveModel):
 def reproduce(
     n_epochs=457,
     batch_size=128,
-    log_dir="/tmp/run",
+    log_dir="./experiments/gated_pixelCNN",
     n_gpus=1,
     device_id=0,
     debug_loader=None,

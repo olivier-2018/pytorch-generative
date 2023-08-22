@@ -138,7 +138,10 @@ class Trainer:
         self._examples_processed = checkpoint["examples_processed"]
         self._time_taken = checkpoint["time_taken"]
         if self.lr_scheduler is not None:
-            self.lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
+            try:
+                self.lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
+            except:
+                print("Warning: Scheduler not found in checkpoint. Continuing...")
 
         # NOTE(eugenhotaj): We need to replace the SummaryWriter and ensure any
         # logs written after the last saved checkpoint are purged.
@@ -245,35 +248,43 @@ class Trainer:
                     f"group_{i}": param["lr"]
                     for i, param in enumerate(self.optimizer.param_groups)
                 }
-                self._summary_writer.add_scalars("metrics/lr", lrs, self._step)
+                self._summary_writer.add_scalars("train/lr", lrs, self._step)
                 metrics = self._train_one_batch(x, y)
                 self._log_metrics(metrics, training=True)
 
                 self._time_taken += time.time() - start_time
                 start_time = time.time()
                 self._summary_writer.add_scalar(
-                    "speed/examples_per_sec",
+                    "train/examples_per_sec",
                     self._examples_processed / self._time_taken,
                     self._step,
                 )
                 self._summary_writer.add_scalar(
-                    "speed/millis_per_example",
+                    "train/millis_per_example",
                     self._time_taken / self._examples_processed * 1000,
                     self._step,
                 )
-                self._summary_writer.add_scalar("speed/epoch", self._epoch, self._step)
-                self._summary_writer.add_scalar("speed/step", self._step, self._step)
+                # self._summary_writer.add_scalar("train/epoch", self._epoch, self._step)
+                # self._summary_writer.add_scalar("train/step", self._step, self._step)
+                if i % ( len(self.train_loader) // 10 ) == 0:
+                    print(f"Training - epoch:{self._epoch}/{max_epochs} step={i}/{len(self.train_loader)} global_step={self._step} loss={metrics['loss']} gradient={metrics['grad_norm']} lr={self.optimizer.param_groups[0]['lr']} ")
+                    
                 self._step += 1
 
             # Evaluate.
             n_examples, sum_metrics = 0, collections.defaultdict(float)
-            for batch in self.eval_loader:
+            dataloader_size = len(self.eval_loader)
+
+            for i, batch in enumerate(self.eval_loader):
                 batch = batch if isinstance(batch, (tuple, list)) else (batch, None)
                 x, y = batch
                 n_batch_examples = x.shape[0]
                 n_examples += n_batch_examples
                 for key, metric in self._eval_one_batch(x, y).items():
                     sum_metrics[key] += metric * n_batch_examples
+                if i % ( len(self.eval_loader) // 5 ) == 0:
+                    print(f"Eval - step={i}/{len(self.eval_loader)} loss={metrics['loss']}")
+              
             metrics = {key: metric / n_examples for key, metric in sum_metrics.items()}
             self._log_metrics(metrics, training=False)
 

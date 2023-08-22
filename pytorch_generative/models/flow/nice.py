@@ -164,7 +164,7 @@ class NICE(base.GenerativeModel):
 def reproduce(
     n_epochs=150,
     batch_size=1024,
-    log_dir="/tmp/run",
+    log_dir="./experiments/NICE",
     n_gpus=1,
     device_id=0,
     debug_loader=None,
@@ -201,6 +201,7 @@ def reproduce(
     # NOTE: We found most hyperparameters from the paper give bad results so we only use
     # the learning rate.
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_loader), gamma=0.9)
 
     def loss_fn(x, _, preds):
         preds, log_det_J = preds
@@ -218,7 +219,7 @@ def reproduce(
         optimizer=optimizer,
         train_loader=train_loader,
         eval_loader=test_loader,
-        lr_scheduler=None,
+        lr_scheduler=scheduler,
         log_dir=log_dir,
         n_gpus=n_gpus,
         device_id=device_id,

@@ -93,7 +93,7 @@ class NADE(base.AutoregressiveModel):
 def reproduce(
     n_epochs=50,
     batch_size=512,
-    log_dir="/tmp/run",
+    log_dir="./experiments/NADE",
     n_gpus=1,
     device_id=0,
     debug_loader=None,
@@ -126,7 +126,8 @@ def reproduce(
 
     model = models.NADE(input_dim=784, hidden_dim=500)
     optimizer = optim.Adam(model.parameters())
-
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_loader), gamma=0.8)
+    
     def loss_fn(x, _, preds):
         batch_size = x.shape[0]
         x, preds = x.view((batch_size, -1)), preds.view((batch_size, -1))
@@ -137,6 +138,7 @@ def reproduce(
         model=model,
         loss_fn=loss_fn,
         optimizer=optimizer,
+        lr_scheduler=scheduler,
         train_loader=train_loader,
         eval_loader=test_loader,
         log_dir=log_dir,
